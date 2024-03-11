@@ -1,0 +1,2 @@
+vagrant destroy --force win-2022
+vagrant up --provision
