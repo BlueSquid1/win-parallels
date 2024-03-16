@@ -12,5 +12,15 @@ echo "install choco"
 New-Item -path $PROFILE -type file -force
 Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\ProgramData\chocolatey\bin'"
 
-echo "install flare tools"
-choco install -y notepadplusplus
+echo "install dev tools"
+choco install -y git
+choco install -y netcat
+#choco install -y visualstudio2022buildtools
+#Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin'"
+#Export-ModuleMember -Alias refreshenv -Function 'Update-SessionEnvironment', 'TabExpansion'
+#Import-Module C:\ProgramData\chocolatey\helpers\chocolateyProfile.psm1
+#refreshenv
+
+#ROSE
+#Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\Rose'"
+#reload terminal

@@ -11,5 +11,6 @@ Vagrant.configure("2") do |config|
   config.vm.communicator = "winrm"
   
   config.vm.network "forwarded_port", guest: 22, host: 22
+  config.vm.network "private_network", ip: "192.168.50.2"
   config.vm.provision "shell", inline: $script
 end

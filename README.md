@@ -1,5 +1,5 @@
-# commando-fusion
-Repo to automatically setup commando-vm inside VMWare Fusion from a base windows image.
+# win-parallels
+Repo to automatically setup windows server 2022 inside Parallels hypervisor.
 
 ## useful commands
 vagrant reload - redeploy an image

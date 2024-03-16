@@ -1,2 +1,9 @@
+#!/bin/bash
+
+if (ps aux | grep Rose | grep -v grep > /dev/null) then
+    echo RUNNING
+else
+    /Applications/Rose.app/Contents/MacOS/Rose &
+fi
 vagrant up
 vagrant ssh win-2022
