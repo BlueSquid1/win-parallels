@@ -5,5 +5,8 @@ if (ps aux | grep Rose | grep -v grep > /dev/null) then
 else
     /Applications/Rose.app/Contents/MacOS/Rose &
 fi
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export VAGRANT_CWD="$SCRIPT_DIR"
 vagrant up
 vagrant ssh win-2022
