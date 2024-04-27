@@ -1,5 +1,5 @@
 echo "setup SSH"
-Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Add-WindowsCapability -Online -Name OpenSSH.Server
 Get-Service -Name sshd | Set-Service -StartupType Automatic
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -Force
 Start-Service sshd
@@ -21,7 +21,8 @@ choco install -y netcat
 choco install -y visualstudio2022buildtools
 Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin'"
 choco install -y firefox
-
+choco install -y openvpn
+Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\OpenVPN\bin'"
 #ROSE
 #cd ~/Desktop
 #reload terminal
