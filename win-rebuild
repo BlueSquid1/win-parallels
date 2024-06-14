@@ -1,5 +1,5 @@
 #!/bin/bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export VAGRANT_CWD="$SCRIPT_DIR"
-vagrant destroy --force win-2022
+vagrant destroy --force win-11
 vagrant up --provision

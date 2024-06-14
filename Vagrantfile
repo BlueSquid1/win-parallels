@@ -4,10 +4,9 @@
 $script = File.read(__dir__ + "/rebuild.ps1")
 
 Vagrant.configure("2") do |config|
-  config.vm.define "win-2022"
-  config.vm.box = "stromweld/windows-2022"
+  config.vm.define "win-11"
+  config.vm.box = "stromweld/windows-11"
   config.vm.boot_timeout = 150
-  config.vm.communicator = "winrm"
   
   config.vm.network "private_network", ip: "192.168.50.2"
 

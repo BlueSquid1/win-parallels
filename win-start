@@ -9,4 +9,4 @@ fi
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export VAGRANT_CWD="$SCRIPT_DIR"
 vagrant up
-vagrant ssh win-2022
+vagrant ssh win-11
