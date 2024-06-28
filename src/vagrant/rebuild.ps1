@@ -3,7 +3,7 @@ Add-WindowsCapability -Online -Name OpenSSH.Server
 Get-Service -Name sshd | Set-Service -StartupType Automatic
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -Force
 Start-Service sshd
-
+exit
 echo "setup RDP"
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
 
@@ -21,7 +21,7 @@ choco install -y netcat
 choco install -y visualstudio2022buildtools
 Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin'"
 choco install -y firefox
-choco install -y openvpn
+#choco install -y openvpn #doesn't work
 Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\OpenVPN\bin'"
 #ROSE
 #cd ~/Desktop

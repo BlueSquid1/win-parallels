@@ -1,5 +1,8 @@
 #!/bin/bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-export VAGRANT_CWD="$SCRIPT_DIR"
+export VAGRANT_CWD="$SCRIPT_DIR/src/vagrant"
 vagrant destroy --force win-11
-vagrant up --provision
+# common place to share files
+#mkdir -p /tmp/shared
+vagrant up --no-provision #--no-destroy-on-error
+vagrant provision win-11

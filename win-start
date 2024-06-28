@@ -6,7 +6,10 @@ else
     /Applications/Rose.app/Contents/MacOS/Rose &
 fi
 
+# common place to share files
+mkdir -p /tmp/shared
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-export VAGRANT_CWD="$SCRIPT_DIR"
+export VAGRANT_CWD="$SCRIPT_DIR/src/vagrant"
 vagrant up
 vagrant ssh win-11
