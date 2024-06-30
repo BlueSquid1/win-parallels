@@ -21,8 +21,8 @@
           <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
         </ProductKey>
         <AcceptEula>true</AcceptEula>
-        <FullName>Parallels</FullName>
-        <Organization>Parallels, Inc.</Organization>
+        <FullName>vagrant</FullName>
+        <Organization>vagrant</Organization>
       </UserData>
       <ImageInstall>
         <OSImage>
@@ -202,7 +202,7 @@
           <CommandLine>powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"; powershell -NoLogo -ExecutionPolicy RemoteSigned -File F:\first_logon_commands.ps1</CommandLine>
           <Description>Run startup scripts</Description>
           <Order>1</Order>
-          <RequiresUserInput>true</RequiresUserInput>
+          <RequiresUserInput>false</RequiresUserInput>
         </SynchronousCommand>
       </FirstLogonCommands>
       <OOBE>

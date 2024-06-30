@@ -23,6 +23,10 @@ vagrant reload - redeploy an image
     brew install hashicorp/tap/packer
     packer plugins install github.com/parallels/parallels
     ```
+- Ansible is used to configure the windows VM. Can be installed by running:
+   ```
+   brew install ansible
+   ```
 # Build instructions
 cd win-parallels
 vagrant up
