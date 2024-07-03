@@ -127,22 +127,11 @@ build {
     "source.parallels-iso.image"
   ]
 
-  #provisioner "powershell" {
-  #  scripts = [
-  #    "./late_setup.ps1"
-  #  ]
-  #}
-
   provisioner "ansible" {
     user                   = "vagrant"
-    #galaxy_file            = "${path.cwd}/ansible/windows-requirements.yml"
-    #galaxy_force_with_deps = true
+    galaxy_file            = "./windows-requirements.yml"
     use_proxy              = false
     playbook_file          = "./playbook.yml"
-    #roles_path             = "${path.cwd}/ansible/roles"
-    #ansible_env_vars = [
-    #  "ANSIBLE_CONFIG=${path.cwd}/ansible/ansible.cfg"
-    #]
     extra_arguments = [
       "--extra-vars", "use_proxy=false",
       "--extra-vars", "ansible_connection=winrm",
@@ -153,9 +142,8 @@ build {
     ]
   }
 
-  #provisioner "windows-restart" {}
-
   post-processor "vagrant" {
+    compression_level    = 9
     keep_input_artifact  = false
     output               = local.vagrant_output_dir
   }

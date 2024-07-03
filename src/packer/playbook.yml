@@ -2,9 +2,72 @@
 - name: Playbook for windows 11
   hosts: all
   gather_facts: true
+  become_method: runas
+  become: yes
+  become_user: vagrant
 
   tasks:
     - name: Install all updates and reboot as many times as needed
       ansible.windows.win_updates:
         category_names: '*'
         reboot: true
+
+    - name: make user auto logon
+      ansible.windows.win_regedit:
+        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+        name: 'AutoLogonCount'
+        data: 0
+        type: dword
+
+    - name: Disable UAC
+      ansible.windows.win_regedit:
+        path: 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System'
+        name: 'EnableLUA'
+        data: 0
+        type: dword
+
+    - name: install OpenSSH
+      win_shell: Add-WindowsCapability -Online -Name OpenSSH.Server
+
+    - name: Enable OpenSSH on startup
+      win_shell: Set-Service -Name sshd -StartupType 'Automatic'
+
+    - name: Set the default shell to PowerShell
+      win_shell: >
+        New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value
+        "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        -PropertyType String -Force
+
+    - name: create .ssh folder for vagrant user
+      win_shell: >
+        if (!(Test-Path "$env:USERPROFILE\.ssh")) {
+          New-Item -Path "$env:USERPROFILE\.ssh" -ItemType Directory
+        }
+
+    - name: install vagrant public key
+      win_shell: |
+        $pubkey_url = "https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub"
+        Invoke-WebRequest -Uri $pubkey_url -OutFile "$env:USERPROFILE\.ssh\authorized_keys" -UseBasicParsing
+
+    - name: enable key authentification
+      win_shell: |
+        Add-Content -Path "$env:ProgramData\ssh\sshd_config" -Value 'PubkeyAuthentication yes'
+
+    - name: Start OpenSSH
+      win_shell: Start-Service sshd
+
+    - name: Disable firewall
+      win_firewall:
+        state: disabled
+    
+    - name: make password never expire
+      win_command: cmd.exe /c wmic useraccount where "name='vagrant'" set PasswordExpires=FALSE
+
+    - name: disable hibernation
+      win_shell: powercfg /hibernate off
+    
+    - name: use high performance power plan
+      win_shell: powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+
+    - name: reclaim free disk space
+      win_shell: "defrag.exe C: /H /L"

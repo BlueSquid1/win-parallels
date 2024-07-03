@@ -5,6 +5,7 @@ Repo to automatically setup windows server 2022 inside Parallels hypervisor.
 vagrant reload - redeploy an image
 
 ## pre-requirements
+- Windows 11 arm .iso file. Refer to: https://github.com/Parallels/packer-examples/blob/main/windows/README.md#windows-11-on-arm-iso
 - Parellels Pro Edition (won't work with Parellels Standard Edition). 
     - can download from: https://www.parallels.com
 - Vagrant. Can be installed by running:
@@ -12,10 +13,6 @@ vagrant reload - redeploy an image
     brew tap hashicorp/tap
     brew install hashicorp/tap/hashicorp-vagrant
     vagrant plugin install vagrant-parallels
-    ```
-- Wimlib for building the windows iso. Can be installed by running:
-    ```
-    brew install wimlib
     ```
 - Packer for building a vagrant box. Can be installed by running:
     ```
