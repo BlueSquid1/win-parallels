@@ -1,8 +1,15 @@
 #!/bin/bash
+set -e
+
+# Needed to resolve this issue: https://github.com/ansible/ansible/issues/76322#issuecomment-974147955
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export VAGRANT_CWD="$SCRIPT_DIR/src/vagrant"
-vagrant destroy --force win-11
-# common place to share files
-#mkdir -p /tmp/shared
-vagrant up --no-provision #--no-destroy-on-error
-vagrant provision win-11
+
+VM_NAME="win-11"
+BOX_PATH=${SCRIPT_DIR}/box/Windows_11_ARM64.box
+
+${SCRIPT_DIR}/src/vagrant/destroy_box.sh ${BOX_PATH} ${VM_NAME}
+${SCRIPT_DIR}/src/packer/rebuild_box.sh ${BOX_PATH}
+${SCRIPT_DIR}/src/vagrant/unpack_box.sh ${BOX_PATH} ${VM_NAME}

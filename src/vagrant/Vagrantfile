@@ -1,22 +1,41 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$script = File.read(__dir__ + "/src/rebuild.ps1")
+current_script_path = File.dirname(File.expand_path(__FILE__))
 
 Vagrant.configure("2") do |config|
-  config.vm.define "win-11"
-  config.vm.box = "hbsmith/win11-arm"
-  config.vm.boot_timeout = 60
-  #config.vm.communicator = "winrm"
+  #config.vm.define ENV['VM_NAME']
+  #config.vm.box = ENV['BOX_PATH']
+  config.vm.define 'win-11'
+  config.vm.box = '/Users/clintonpage/Desktop/mygit/win-parallels/box/Windows_11_ARM64.box'
   config.vm.guest = :windows
-  config.vm.communicator = "ssh"
-  
-  #config.vm.network "private_network", type: "dhcp" #only added to avoid a bug with vagrant/parallels were the default network can't communicate with the host
+  config.vm.communicator = "winrm"
 
-  config.vm.synced_folder "/tmp/shared", "C:\\windows\\Temp\\shared", create: true
+  config.vm.synced_folder "/tmp/shared", 'C:\windows\Temp\shared', create: true
 
-  #config.vm.provision "shell", inline: $script
+  # There is a bug when using ansible via winrm where it can't find the ip address of the guest.
+  # workaround is to retrieve the ip address via the script below before calling the ansible playbook.  
+  config.vm.provision :host_shell do |host_shell|
+    $script = <<-'SCRIPT'
+      guest_ip=$(vagrant winrm-config win-11 | awk '/HostName/ { print $2; exit }')
+      echo  "win-11 ansible_host=$guest_ip" > ./inventory.ini
+      while ! [ -s ./inventory.ini ]; do
+        sleep 1
+      done
+    SCRIPT
+    host_shell.inline = $script
+  end
+
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "playbook.yml"
+    ansible.inventory_path = "#{current_script_path}/inventory.ini"
+    ansible.extra_vars = {
+      ansible_connection: 'winrm',
+      ansible_become_user: 'vagrant',
+      ansible_user: 'vagrant',
+      ansible_password: 'vagrant',
+      use_proxy: false,
+      ansible_port: 5985
+    }
+    ansible.playbook = "#{current_script_path}/playbook.yml"
   end
 end

@@ -129,9 +129,9 @@ build {
 
   provisioner "ansible" {
     user                   = "vagrant"
-    galaxy_file            = "./windows-requirements.yml"
+    galaxy_file            = "${path.root}/windows-requirements.yml"
     use_proxy              = false
-    playbook_file          = "./playbook.yml"
+    playbook_file          = "${path.root}/playbook.yml"
     extra_arguments = [
       "--extra-vars", "use_proxy=false",
       "--extra-vars", "ansible_connection=winrm",
@@ -143,7 +143,6 @@ build {
   }
 
   post-processor "vagrant" {
-    compression_level    = 9
     keep_input_artifact  = false
     output               = local.vagrant_output_dir
   }

@@ -1,0 +1,107 @@
+---
+- name: Playbook for windows 11
+  hosts: all
+  gather_facts: true
+  become_method: runas
+  become: yes
+  become_user: vagrant
+# fix ssh key missing
+# fix turn of windows defender
+# install choco
+  tasks:
+    - name: disable auto logon counter
+      ansible.windows.win_regedit:
+        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+        name: 'AutoLogonCount'
+        data: 0
+        type: dword
+
+    - name: make windows automatically logon
+      ansible.windows.win_regedit:
+        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+        name: 'AutoAdminLogon'
+        data: 1
+        type: string
+
+    - name: set auto logon username
+      ansible.windows.win_regedit:
+        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+        name: 'DefaultUserName'
+        data: 'vagrant'
+        type: string
+
+    - name: set auto logon password
+      ansible.windows.win_regedit:
+        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+        name: 'DefaultPassword'
+        data: 'vagrant'
+        type: string
+
+    - name: use high performance power plan
+      win_shell: powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+
+    - name: install OpenSSH
+      win_shell: Add-WindowsCapability -Online -Name OpenSSH.Server
+
+    - name: Enable OpenSSH on startup
+      win_shell: Set-Service -Name sshd -StartupType 'Automatic'
+
+    - name: create .ssh folder for vagrant user
+      win_shell: >
+        if (!(Test-Path "$env:USERPROFILE\.ssh")) {
+          New-Item -Path "$env:USERPROFILE\.ssh" -ItemType Directory
+        }
+
+    - name: install vagrant public key
+      win_shell: |
+        $pubkey_url = "https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub"
+        Invoke-WebRequest -Uri $pubkey_url -OutFile "$env:USERPROFILE\.ssh\authorized_keys" -UseBasicParsing
+
+    - name: Start OpenSSH
+      win_shell: Start-Service sshd
+
+    - name: enable key authentification
+      win_shell: |
+        Add-Content -Path "$env:ProgramData\ssh\sshd_config" -Value 'PubkeyAuthentication yes'
+
+    - name: Set the default shell to PowerShell
+      win_shell: >
+        New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value
+        "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        -PropertyType String -Force
+
+
+# echo "setup RDP"
+# Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+
+# echo "install choco"
+# [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# # Create a powershell profile
+# New-Item -path $PROFILE -type file -force
+# Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\ProgramData\chocolatey\bin'"
+
+# echo "install dev tools"
+# choco install -y git
+# Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\Git\bin'"
+# choco install -y netcat
+# choco install -y visualstudio2022buildtools
+# Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin'"
+# choco install -y firefox
+# #choco install -y openvpn #doesn't work
+# Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\OpenVPN\bin'"
+# #ROSE
+# #cd ~/Desktop
+# #reload terminal
+# #git clone https://github.com/BlueSquid1/rose.git
+# #cd rose
+# #& 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe' modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools" --config ".\client\rose.vsconfig" --quiet
+# #Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\dotnet'"
+# #cd client
+# #reload terminal
+# #dotnet restore
+# #MSBuild.exe /property:Configuration=Release
+# #cp -r .\rose\bin\Release\net8.0 'C:\Program Files\Rose'
+# #Add-Content -Path $PROFILE -Value "`$env:Path += ';C:\Program Files\Rose'"
+# #reload terminal
+# #open regedit and set SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\fAllowUnlistedRemotePrograms to 1

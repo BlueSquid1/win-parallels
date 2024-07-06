@@ -24,6 +24,14 @@ vagrant reload - redeploy an image
    ```
    brew install ansible
    ```
+- Wimlib to convert .esd to .iso
+   ```
+   brew install wimlib
+   ```
+- host shell lets vagrant script run commands on host
+   ```
+   vagrant plugin install vagrant-host-shell
+   ```
 # Build instructions
 cd win-parallels
 vagrant up
