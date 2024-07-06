@@ -6,7 +6,7 @@
   become: yes
   become_user: vagrant
 # fix ssh key missing
-# fix turn of windows defender
+# fix turn off windows defender
 # install choco
   tasks:
     - name: disable auto logon counter
@@ -52,17 +52,16 @@
           New-Item -Path "$env:USERPROFILE\.ssh" -ItemType Directory
         }
 
-    - name: install vagrant public key
+    - name: install vagrant public key to vagrant user
       win_shell: |
         $pubkey_url = "https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub"
         Invoke-WebRequest -Uri $pubkey_url -OutFile "$env:USERPROFILE\.ssh\authorized_keys" -UseBasicParsing
 
+    - name: install vagrant public key to Administrator user
+      win_shell: cp "$env:USERPROFILE\.ssh\authorized_keys" "$env:ProgramData\ssh\administrators_authorized_keys"
+
     - name: Start OpenSSH
       win_shell: Start-Service sshd
-
-    - name: enable key authentification
-      win_shell: |
-        Add-Content -Path "$env:ProgramData\ssh\sshd_config" -Value 'PubkeyAuthentication yes'
 
     - name: Set the default shell to PowerShell
       win_shell: >

@@ -1,11 +1,7 @@
 # win-parallels
-Repo to automatically setup windows server 2022 inside Parallels hypervisor.
-
-## useful commands
-vagrant reload - redeploy an image
+Repo to automatically setup windows 11 inside Parallels hypervisor.
 
 ## pre-requirements
-- Windows 11 arm .iso file. Refer to: https://github.com/Parallels/packer-examples/blob/main/windows/README.md#windows-11-on-arm-iso
 - Parellels Pro Edition (won't work with Parellels Standard Edition). 
     - can download from: https://www.parallels.com
 - Vagrant. Can be installed by running:
@@ -32,7 +28,14 @@ vagrant reload - redeploy an image
    ```
    vagrant plugin install vagrant-host-shell
    ```
-# Build instructions
-cd win-parallels
-vagrant up
 
+## Build instructions
+### Build image from scratch
+
+`./win-rebuild`
+
+### Launch container
+`./win-start`
+
+### Pause container
+`./win-stop`
