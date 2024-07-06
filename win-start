@@ -11,5 +11,5 @@ mkdir -p /tmp/shared
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export VAGRANT_CWD="$SCRIPT_DIR/src/vagrant"
-vagrant up
+vagrant up --no-provision
 vagrant ssh win-11
