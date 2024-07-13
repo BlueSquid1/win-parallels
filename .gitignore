@@ -1,4 +1,5 @@
 .vagrant/
 .DS_Store
 box/
-/src/vagrant/inventory.ini
+inventory.ini
+win-reprovision

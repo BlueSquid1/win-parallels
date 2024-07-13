@@ -14,36 +14,62 @@
         data: 0
         type: dword
 
-    - name: Disable IPv6
+    - name: Disable IPv6. Needed so winrm is reliable
       ansible.windows.win_regedit:
         path: 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters'
         name: 'DisabledComponents'
         data: 0xFF
         type: dword
 
-    - name: Disable firewall
-      win_firewall:
-        state: disabled
-
-    - name: Disabling Local Administrator Password Expiration
-      ansible.windows.win_user:
-        name: Administrator
-        password_never_expires: true
-
     - name: Disabling vagrant Password Expiration
       ansible.windows.win_user:
         name: vagrant
         password_never_expires: true
 
+    - name: Disable local Administrator
+      ansible.windows.win_user:
+        name: Administrator
+        account_disabled: true
+
     - name: Install all updates and reboot as many times as needed
       ansible.windows.win_updates:
         category_names: '*'
         reboot: true
-      
-    - name: Ensure that WinRM services starts without delay
-      ansible.windows.win_service:
-        name: WinRM
-        start_mode: auto
+        # these updates cause errors so disable them
+        reject_list:
+          - KB5040442
+          - KB2267602
+          - KB5039895
+          - KB5007651
 
-    - name: reclaim free disk space
+    - name: Download winget manually because can't update winget with winget or Microsoft store
+      win_shell: |
+        Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+        Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.arm64.14.00.Desktop.appx -OutFile Microsoft.VCLibs.arm64.14.00.Desktop.appx
+        Invoke-WebRequest -Uri https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.arm64.appx -OutFile Microsoft.UI.Xaml.2.8.arm64.appx
+
+    - name: Updating winget
+      win_shell: |
+        $progressPreference = 'silentlyContinue'
+        Add-AppxPackage Microsoft.VCLibs.arm64.14.00.Desktop.appx
+        Add-AppxPackage Microsoft.UI.Xaml.2.8.arm64.appx
+        Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+
+    - name: Removing download winget package
+      win_shell: |
+        Remove-Item Microsoft.VCLibs.arm64.14.00.Desktop.appx
+        Remove-Item Microsoft.UI.Xaml.2.8.arm64.appx
+        Remove-Item Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+
+    - name: Update all other apps via Microsoft Store
+      win_shell: (Get-WmiObject -Namespace "root\cimv2\mdm\dmmap" -Class "MDM_EnterpriseModernAppManagement_AppManagement01").UpdateScanMethod()
+
+    - name: Pause for 10 minutes for Microsoft store to finish updates
+      ansible.builtin.pause:
+        minutes: 10
+
+    - name: Reboot windows so app in use get updated
+      ansible.windows.win_reboot:
+
+    - name: Reclaim free disk space
       win_shell: "defrag.exe C: /H /L"

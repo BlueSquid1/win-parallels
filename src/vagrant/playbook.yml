@@ -5,14 +5,41 @@
   become_method: runas
   become: yes
   become_user: vagrant
-  
-  tasks:
-    - name: Ensure Chocolatey is up-to-date
-      win_chocolatey:
-        name: chocolatey
-        state: latest
 
-    - name: install OpenSSH
+  tasks:    
+    - name: Exclude C drive with windows defender
+      win_shell: Add-MpPreference -ExclusionPath 'C:/'
+
+    - name: Disable windows defender
+      script: ./disable_windows_defender.ps1
+
+    - name: Disable firewall
+      win_firewall:
+        state: disabled
+
+    - name: Install source package
+      win_shell: Add-AppxPackage -Path "https://cdn.winget.microsoft.com/cache/source.msix"
+
+    - name: Install system internals
+      win_shell: winget install sysinternals --accept-package-agreements --accept-source-agreements
+
+    - name: Install git
+      win_shell: winget install Git.Git --accept-package-agreements --accept-source-agreements
+
+    - name: install netcat
+      win_chocolatey:
+        name: netcat
+    
+    - name: Install vscode
+      win_shell: winget install Microsoft.VisualStudioCode --accept-package-agreements --accept-source-agreements
+
+    - name: Install firefox
+      win_shell: winget install Mozilla.Firefox --accept-package-agreements --accept-source-agreements
+
+    - name: Install Visual Studio Community
+      win_shell: winget install Microsoft.VisualStudio.2022.Community --accept-package-agreements --accept-source-agreements
+
+    - name: Install OpenSSH
       win_shell: Add-WindowsCapability -Online -Name OpenSSH.Server
 
     - name: Enable OpenSSH on startup
@@ -54,44 +81,6 @@
         type: dword
         data: 0
 
-    - name: Install git
-      win_chocolatey:
-        name: git
-        state: present
-
-    - name: Install firefox
-      win_chocolatey:
-        name: firefox
-        state: present
-
-    - name: disable auto logon counter
-      ansible.windows.win_regedit:
-        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
-        name: 'AutoLogonCount'
-        data: 0
-        type: dword
-
-    - name: make windows automatically logon
-      ansible.windows.win_regedit:
-        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
-        name: 'AutoAdminLogon'
-        data: 1
-        type: string
-
-    - name: set auto logon username
-      ansible.windows.win_regedit:
-        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
-        name: 'DefaultUserName'
-        data: 'vagrant'
-        type: string
-
-    - name: set auto logon password
-      ansible.windows.win_regedit:
-        path: 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
-        name: 'DefaultPassword'
-        data: 'vagrant'
-        type: string
-
 # install nmap manually
 
     # - name: Install VS Tools
@@ -104,9 +93,6 @@
     #   register: vs_output
 
 
-
-# echo "install choco"
-# [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # # Create a powershell profile
 # New-Item -path $PROFILE -type file -force

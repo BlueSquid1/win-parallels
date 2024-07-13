@@ -24,7 +24,7 @@ Set-NetConnectionProfile -Name $connectionProfile.Name -NetworkCategory Private
 
 Write-Output 'Setup Windows Remote Management'
 winrm quickconfig -quiet
-winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="512"}'
+winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="4096"}'
 winrm set winrm/config '@{MaxTimeoutms="1800000"}'
 winrm set winrm/config/service '@{AllowUnencrypted="true"}'
 winrm set winrm/config/service/auth '@{Basic="true"}'

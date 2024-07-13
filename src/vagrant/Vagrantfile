@@ -4,21 +4,19 @@
 current_script_path = File.dirname(File.expand_path(__FILE__))
 
 Vagrant.configure("2") do |config|
-  #config.vm.define ENV['VM_NAME']
-  #config.vm.box = ENV['BOX_PATH']
   config.vm.define 'win-11'
   config.vm.box = '/Users/clintonpage/Desktop/mygit/win-parallels/box/Windows_11_ARM64.box'
 
   config.vm.provider "parallels" do |prl|
     prl.memory = 8192
-    prl.cpus = 5
+    prl.cpus = 4
   end
   
 
   config.vm.guest = :windows
   config.vm.communicator = "winrm"
 
-  config.vm.synced_folder "/tmp/shared", 'C:\windows\Temp\shared', create: true
+  config.vm.synced_folder "~/shared", 'C:\Users\vagrant\shared', create: true
 
   # There is a bug when using ansible via winrm where it can't find the ip address of the guest.
   # workaround is to retrieve the ip address via the script below before calling the ansible playbook.  

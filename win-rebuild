@@ -10,7 +10,14 @@ export VAGRANT_CWD="$SCRIPT_DIR/src/vagrant"
 VM_NAME="win-11"
 BOX_PATH=${SCRIPT_DIR}/box/Windows_11_ARM64.box
 
+echo "destroying an existing Vagrant VMs"
 ${SCRIPT_DIR}/src/vagrant/destroy_container.sh ${BOX_PATH} ${VM_NAME}
-${SCRIPT_DIR}/src/vagrant/destroy_box.sh ${BOX_PATH} ${VM_NAME}
-${SCRIPT_DIR}/src/packer/rebuild_box.sh ${BOX_PATH}
+if [[ $* == *--complete* ]]
+then
+    echo "Deleting vagrant box so it can be rebuilt"
+    ${SCRIPT_DIR}/src/vagrant/destroy_box.sh ${BOX_PATH} ${VM_NAME}
+    echo "Rebuilding vagrant box"
+    ${SCRIPT_DIR}/src/packer/rebuild_box.sh ${BOX_PATH}
+fi
+echo "unpacking box and creating Vagrant VM"
 ${SCRIPT_DIR}/src/vagrant/unpack_box.sh ${BOX_PATH} ${VM_NAME}

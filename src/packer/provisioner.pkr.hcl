@@ -113,12 +113,15 @@ source "parallels-iso" "image" {
   output_directory          = local.output_dir
   shutdown_command          = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
   shutdown_timeout          = var.shutdown_timeout
+  prlctl_post = [
+    ["set", "{{ .Name }}", "--device-del", "cdrom2"]
+  ]
 
   communicator   = "winrm"
   winrm_username = "vagrant"
   winrm_password = "vagrant"
   winrm_port     = 5985
-  winrm_timeout  = "30m"
+  winrm_timeout  = "2h"
   vm_name                   = local.machine_name
 }
 
@@ -145,5 +148,6 @@ build {
   post-processor "vagrant" {
     keep_input_artifact  = false
     output               = local.vagrant_output_dir
+    vagrantfile_template = "${path.root}/Vagrantfile.template"
   }
 }
