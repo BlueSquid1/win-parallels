@@ -5,10 +5,8 @@ current_script_path = File.dirname(File.expand_path(__FILE__))
 
 Vagrant.configure("2") do |config|
   config.vm.define 'win-11'
-  config.vm.box = 'Windows_11_ARM64.box'
+  config.vm.box = 'blueSquid1/Windows-11.box'
 
   config.vm.guest = :windows
   config.vm.communicator = "winrm"
-  # can take several minutes for winrm service to start on windows guest because the service
-  # is set to "Automatic (Delayed Start)". See https://stackoverflow.com/a/18470354
 end
