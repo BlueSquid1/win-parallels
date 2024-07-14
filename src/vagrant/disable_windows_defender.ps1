@@ -21,3 +21,5 @@ Write-Host "Set default actions to Allow"
 Set-MpPreference -LowThreatDefaultAction Allow -ErrorAction SilentlyContinue
 Set-MpPreference -ModerateThreatDefaultAction Allow -ErrorAction SilentlyContinue
 Set-MpPreference -HighThreatDefaultAction Allow -ErrorAction SilentlyContinue
+
+Set-ItemProperty -Path 'HKLM:/SOFTWARE/Policies/Microsoft/Windows Defender' -Name DisableAntiSpyware -Value 1

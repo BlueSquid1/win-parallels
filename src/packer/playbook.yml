@@ -1,10 +1,6 @@
 ---
 - name: Playbook for windows 11
   hosts: all
-  gather_facts: true
-  become_method: runas
-  become: yes
-  become_user: vagrant
 
   tasks:
     - name: Disable UAC
@@ -31,6 +27,11 @@
         name: Administrator
         account_disabled: true
 
+    - name: Make winrm startup quicker
+      ansible.windows.win_service:
+        name: WinRM
+        start_mode: auto
+
     - name: Install all updates and reboot as many times as needed
       ansible.windows.win_updates:
         category_names: '*'
@@ -44,6 +45,7 @@
 
     - name: Download winget manually because can't update winget with winget or Microsoft store
       win_shell: |
+        Invoke-WebRequest -Uri https://cdn.winget.microsoft.com/cache/source.msix -OutFile source.msix
         Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
         Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.arm64.14.00.Desktop.appx -OutFile Microsoft.VCLibs.arm64.14.00.Desktop.appx
         Invoke-WebRequest -Uri https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.arm64.appx -OutFile Microsoft.UI.Xaml.2.8.arm64.appx
@@ -54,12 +56,14 @@
         Add-AppxPackage Microsoft.VCLibs.arm64.14.00.Desktop.appx
         Add-AppxPackage Microsoft.UI.Xaml.2.8.arm64.appx
         Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+        Add-AppxPackage source.msix
 
     - name: Removing download winget package
       win_shell: |
         Remove-Item Microsoft.VCLibs.arm64.14.00.Desktop.appx
         Remove-Item Microsoft.UI.Xaml.2.8.arm64.appx
         Remove-Item Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+        Remove-Item source.msix
 
     - name: Update all other apps via Microsoft Store
       win_shell: (Get-WmiObject -Namespace "root\cimv2\mdm\dmmap" -Class "MDM_EnterpriseModernAppManagement_AppManagement01").UpdateScanMethod()
@@ -70,6 +74,10 @@
 
     - name: Reboot windows so app in use get updated
       ansible.windows.win_reboot:
+
+    - name: Pause for 1 minutes for Microsoft store to finish updates
+      ansible.builtin.pause:
+        minutes: 1
 
     - name: Reclaim free disk space
       win_shell: "defrag.exe C: /H /L"
