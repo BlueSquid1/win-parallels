@@ -146,6 +146,7 @@ build {
   }
 
   post-processor "vagrant" {
+    compression_level    = 9
     keep_input_artifact  = false
     output               = local.vagrant_output_dir
     vagrantfile_template = "${path.root}/Vagrantfile.template"
